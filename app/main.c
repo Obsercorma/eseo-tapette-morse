@@ -46,7 +46,11 @@ int main(void)
 
 
 	screen_init();
-	screen_show_mode(SCREEN_HOME_MODE);
+	//screen_show_mode(SCREEN_HOME_MODE);
+
+	//HAL_Delay(3000);
+
+	screen_show_mode(SCREEN_RECEIVING_MODE);
 
 	led_status_init();
 
