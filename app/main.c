@@ -15,6 +15,7 @@
 #include "stm32g4_uart.h"
 #include "stm32g4_utils.h"
 #include "tft_ili9341/stm32g4_ili9341.h"
+#include "led_status.h"
 
 #include <stdio.h>
 
@@ -46,15 +47,15 @@ int main(void)
 
 	ILI9341_demo();
 
+	led_status_init();
+
 
 	/* Tâche de fond, boucle infinie, Infinite loop,... quelque soit son nom vous n'en sortirez jamais */
 	while (1)
 	{
-		while(BSP_UART_data_ready(UART1_ID)){
-			BSP_UART_putc(UART2_ID, BSP_UART_getc(UART1_ID));
-		}
-		while(BSP_UART_data_ready(UART2_ID)){
-			BSP_UART_putc(UART1_ID, BSP_UART_getc(UART2_ID));
-		}
+		HAL_Delay(1000);
+		led_status_switch(1);
+		HAL_Delay(1000);
+		led_status_switch(0);
 	}
 }
