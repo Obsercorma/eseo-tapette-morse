@@ -14,8 +14,8 @@
 #include "stm32g4_gpio.h"
 #include "stm32g4_uart.h"
 #include "stm32g4_utils.h"
-#include "tft_ili9341/stm32g4_ili9341.h"
 #include "led_status.h"
+#include "screen.h"
 
 #include <stdio.h>
 
@@ -45,7 +45,8 @@ int main(void)
 	//heartbeat();
 
 
-	ILI9341_demo();
+	screen_init();
+	screen_show_mode(SCREEN_HOME_MODE);
 
 	led_status_init();
 
