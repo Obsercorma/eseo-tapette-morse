@@ -8,6 +8,12 @@
 #ifndef SCREEN_H_
 #define SCREEN_H_
 
+#define X_START 20
+#define Y_START 20
+#define X_END 300
+
+#define SECONDS_BEFORE_SHUTDOWN 30U
+
 typedef enum {
 	SCREEN_LEARNING_MODE = 0,
 	SCREEN_HOME_MODE,

@@ -15,7 +15,7 @@
 #include "stm32g4_uart.h"
 #include "stm32g4_utils.h"
 #include "led_status.h"
-#include "screen.h"
+#include "screen/screen.h"
 
 #include <stdio.h>
 
