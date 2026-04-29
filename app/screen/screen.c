@@ -9,6 +9,7 @@
 #include "screen/screen.h"
 #include "screen/frames/home.h"
 #include "screen/frames/shutdown.h"
+#include "screen/frames/typing_mode.h"
 #include "screen/frames/receiving_mode.h"
 #include "tft_ili9341/stm32g4_ili9341.h"
 #include "tft_ili9341/stm32g4_fonts.h"
@@ -34,8 +35,7 @@ void screen_show_mode(ScreenMode mode){
 			home_show_home();
 			break;
 		case SCREEN_RECEIVING_MODE:
-			//show_receiving_mode(1);
-			shutdown_show_alert();
+			typing_mode_show_frame_empty_message();
 			break;
 		default:
 			break;

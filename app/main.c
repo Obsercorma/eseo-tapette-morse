@@ -50,7 +50,7 @@ int main(void)
 
 	//HAL_Delay(3000);
 
-	screen_show_mode(SCREEN_RECEIVING_MODE);
+	screen_show_mode(SCREEN_HOME_MODE);
 
 	led_status_init();
 
