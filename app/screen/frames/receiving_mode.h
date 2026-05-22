@@ -21,4 +21,6 @@ void receiving_mode_show_home(uint8_t is_active);
  */
 void receiving_mode_show_question_message(void);
 
+void receiving_mode_show_received_message(const char* message);
+
 #endif /* SCREEN_SCREEN_RECEIVING_MODE_H_ */

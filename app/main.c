@@ -22,9 +22,10 @@
 #include "screen/frames/receiving_mode.h"
 #include "buttons.h"
 #include "bluetooth.h"
+#include "morse.h"
 
 #include <stdio.h>
-
+#include <string.h>
 
 /**
   * @brief  Point d'entrée de votre application
@@ -64,6 +65,10 @@ int main(void)
 
 	ButtonState_t btn_state;
 	buttons_get_state(&btn_state);
+	BluetoothData_t bt_data;
+	uint8_t bluetooth_buffer[200];
+	bluetooth_buffer[0] = '\0';
+	size_t bluetooth_buffer_size = 0;
 
 	uint32_t last_tick = HAL_GetTick();
 
@@ -71,8 +76,17 @@ int main(void)
 	/* Tâche de fond, boucle infinie, Infinite loop,... quelque soit son nom vous n'en sortirez jamais */
 	while (1)
 	{
-		bluetooth_check_data();
+		bluetooth_check_data(bluetooth_buffer, &bluetooth_buffer_size);
+		bluetooth_get_data(&bt_data);
 		buttons_get_state(&btn_state);
+		if(bluetooth_buffer[0] != '\0'){
+			screen_clear();
+			volatile char* output; // 5 est une estimation de la taille maximale d'un message Morse correspondant à une chaîne de caractères (1 caractère = 4 symboles Morse + 1 espace)
+			morse_encode(bluetooth_buffer, output);
+			receiving_mode_show_received_message(output);
+			bluetooth_buffer[0] = '\0';
+			HAL_Delay(10000);
+		}
 		HAL_Delay(10);
 		if(btn_state.new_event){
 			screen_clear();
