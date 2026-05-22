@@ -26,6 +26,10 @@ void screen_init(){
 	selectedMode = SCREEN_HOME_MODE;
 }
 
+void screen_clear(){
+	ILI9341_Fill(ILI9341_COLOR_WHITE);
+}
+
 void screen_show_mode(ScreenMode mode){
 	selectedMode = mode;
 	ILI9341_Fill(ILI9341_COLOR_WHITE); // Clear the screen

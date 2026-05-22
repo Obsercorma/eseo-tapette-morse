@@ -16,6 +16,12 @@
 #include "stm32g4_utils.h"
 #include "led_status.h"
 #include "screen/screen.h"
+#include "screen/frames/home.h"
+#include "screen/frames/shutdown.h"
+#include "screen/frames/typing_mode.h"
+#include "screen/frames/receiving_mode.h"
+#include "buttons.h"
+#include "bluetooth.h"
 
 #include <stdio.h>
 
@@ -34,10 +40,10 @@ int main(void)
 	/* Initialisation des périphériques utilisés dans votre programme */
 	BSP_GPIO_enable();
 
+	bluetooth_init();
+
 	//BSP_GPIO_pin_config(GPIOB, GPIO_PIN_4, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, GPIO_SPEED_LOW, GPIO_NO_AF);
 	//HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, 1);
-	BSP_UART_init(UART2_ID,38400);
-	BSP_UART_init(UART1_ID, 38400);
 
 	/* Indique que les printf sont dirigés vers l'UART2 */
 	//BSP_SYS_set_std_usart(UART2_ID, UART2_ID, UART2_ID);
@@ -54,13 +60,38 @@ int main(void)
 
 	led_status_init();
 
+	buttons_init();
+
+	ButtonState_t btn_state;
+	buttons_get_state(&btn_state);
+
+	uint32_t last_tick = HAL_GetTick();
+
 
 	/* Tâche de fond, boucle infinie, Infinite loop,... quelque soit son nom vous n'en sortirez jamais */
 	while (1)
 	{
-		HAL_Delay(1000);
-		led_status_switch(1);
-		HAL_Delay(1000);
-		led_status_switch(0);
+		bluetooth_check_data();
+		buttons_get_state(&btn_state);
+		HAL_Delay(10);
+		if(btn_state.new_event){
+			screen_clear();
+			if(btn_state.which_btn == BTN_PIN_M_NUMBER){
+				home_show_home();
+			}
+			if(btn_state.which_btn == BTN_PIN_U_NUMBER){
+				typing_mode_show_btns_instructions();
+			}
+			if(btn_state.which_btn == BTN_PIN_L_NUMBER){
+				receiving_mode_show_question_message();
+			}
+			if(btn_state.which_btn == BTN_PIN_R_NUMBER){
+				shutdown_show_alert();
+			}
+			if(btn_state.which_btn == BTN_PIN_D_NUMBER){
+				typing_mode_show_instructions_calibration();
+			}
+			HAL_Delay(200);
+		}
 	}
 }

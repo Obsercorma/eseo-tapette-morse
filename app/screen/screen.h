@@ -32,4 +32,9 @@ void screen_show_mode(ScreenMode mode);
 
 ScreenMode screen_get_mode(void);
 
+/**
+ * @brief Efface tout le contenu de l'écran
+ */
+void screen_clear(void);
+
 #endif /* SCREEN_H_ */
