@@ -26,7 +26,6 @@
 typedef struct {
 	volatile uint8_t which_btn;
 	volatile uint32_t duration;
-	volatile uint8_t state;
 	volatile uint8_t new_event;
 } ButtonState_t;
 

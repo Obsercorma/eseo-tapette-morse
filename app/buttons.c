@@ -26,7 +26,6 @@ void buttons_init(){
 	BSP_EXTIT_set_callback(callback_handler, BTN_PIN_M_NUMBER, 1);
 
 	button_state.which_btn = 0;
-	button_state.state = 0;
 	button_state.duration = 0;
 	button_state.new_event = 0;
 }
