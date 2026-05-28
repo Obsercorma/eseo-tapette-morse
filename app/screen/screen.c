@@ -16,6 +16,7 @@
 
 ScreenMode selectedMode;
 
+static ScreenCallbacks_t options_callbacks;
 
 void screen_init(){
 	ILI9341_Init();
@@ -24,25 +25,34 @@ void screen_init(){
 	ILI9341_DisplayOn();
 	ILI9341_Fill(ILI9341_COLOR_WHITE);
 	selectedMode = SCREEN_HOME_MODE;
+	options_callbacks.button_u = NULL;
+	options_callbacks.button_m = NULL;
+	options_callbacks.button_r = NULL;
+	options_callbacks.button_l = NULL;
+	options_callbacks.button_d = NULL;
 }
 
 void screen_clear(){
 	ILI9341_Fill(ILI9341_COLOR_WHITE);
 }
 
-void screen_show_mode(ScreenMode mode){
-	selectedMode = mode;
-	ILI9341_Fill(ILI9341_COLOR_WHITE); // Clear the screen
-	// TODO: call methods according to the selected mode
-	switch(mode){
-		case SCREEN_HOME_MODE:
-			home_show_home();
-			break;
-		case SCREEN_RECEIVING_MODE:
-			typing_mode_show_frame_empty_message();
-			break;
-		default:
-			break;
+void screen_set_callbacks(ScreenCallbacks_t* callbacks){
+	if(callbacks != NULL){
+		options_callbacks.button_u = callbacks->button_u;
+		options_callbacks.button_m = callbacks->button_m;
+		options_callbacks.button_r = callbacks->button_r;
+		options_callbacks.button_l = callbacks->button_l;
+		options_callbacks.button_d = callbacks->button_d;
+	}
+}
+
+void screen_get_callbacks(ScreenCallbacks_t* callbacks){
+	if(callbacks != NULL){
+		callbacks->button_u = options_callbacks.button_u;
+		callbacks->button_m = options_callbacks.button_m;
+		callbacks->button_r = options_callbacks.button_r;
+		callbacks->button_l = options_callbacks.button_l;
+		callbacks->button_d = options_callbacks.button_d;
 	}
 }
 

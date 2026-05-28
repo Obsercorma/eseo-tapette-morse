@@ -57,7 +57,9 @@ int main(void)
 
 	//HAL_Delay(3000);
 
-	screen_show_mode(SCREEN_HOME_MODE);
+	ScreenCallbacks_t screen_callbacks;
+	home_show_home();
+	screen_get_callbacks(&screen_callbacks);
 
 	led_status_init();
 
@@ -66,7 +68,7 @@ int main(void)
 	ButtonState_t btn_state;
 	buttons_get_state(&btn_state);
 	BluetoothData_t bt_data;
-	uint8_t bluetooth_buffer[200];
+	char bluetooth_buffer[200];
 	bluetooth_buffer[0] = '\0';
 	size_t bluetooth_buffer_size = 0;
 
@@ -81,30 +83,31 @@ int main(void)
 		buttons_get_state(&btn_state);
 		if(bluetooth_buffer[0] != '\0'){
 			screen_clear();
-			volatile char* output; // 5 est une estimation de la taille maximale d'un message Morse correspondant à une chaîne de caractères (1 caractère = 4 symboles Morse + 1 espace)
-			morse_encode(bluetooth_buffer, output);
+			char output[512] = {0}; // 5 est une estimation de la taille maximale d'un message Morse correspondant à une chaîne de caractères (1 caractère = 4 symboles Morse + 1 espace)
+			morse_decode(bluetooth_buffer, output);
 			receiving_mode_show_received_message(output);
 			bluetooth_buffer[0] = '\0';
-			HAL_Delay(10000);
+			HAL_Delay(1000);
 		}
 		HAL_Delay(10);
 		if(btn_state.new_event){
 			screen_clear();
 			if(btn_state.which_btn == BTN_PIN_M_NUMBER){
-				home_show_home();
+				screen_callbacks.button_m();
 			}
 			if(btn_state.which_btn == BTN_PIN_U_NUMBER){
-				typing_mode_show_btns_instructions();
+				screen_callbacks.button_u();
 			}
 			if(btn_state.which_btn == BTN_PIN_L_NUMBER){
-				receiving_mode_show_question_message();
+				screen_callbacks.button_l();
 			}
 			if(btn_state.which_btn == BTN_PIN_R_NUMBER){
-				shutdown_show_alert();
+				screen_callbacks.button_r();
 			}
 			if(btn_state.which_btn == BTN_PIN_D_NUMBER){
-				typing_mode_show_instructions_calibration();
+				screen_callbacks.button_d();
 			}
+			screen_get_callbacks(&screen_callbacks);
 			HAL_Delay(200);
 		}
 	}

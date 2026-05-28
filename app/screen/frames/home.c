@@ -7,10 +7,21 @@
 
 #include "screen/screen.h"
 #include "screen/frames/home.h"
+#include "screen/frames/shutdown.h"
+#include "screen/frames/typing_mode.h"
+#include "screen/frames/receiving_mode.h"
 #include "tft_ili9341/stm32g4_ili9341.h"
 #include "tft_ili9341/stm32g4_fonts.h"
 
 void home_show_home(){
+	ScreenCallbacks_t callbacks = {
+		.button_u  = typing_mode_show_btns_instructions,
+		.button_m  = receiving_mode_show_home,
+		.button_r  = shutdown_show_alert,
+
+	};
+	screen_set_callbacks(&callbacks);
+
 	ILI9341_DrawFilledRectangle(X_START, Y_START, X_END, 60, ILI9341_COLOR_BLUE); // @suppress("Symbol is not resolved")
 	ILI9341_printf(X_START+15, Y_START+15, &Font_7x10, ILI9341_COLOR_WHITE, ILI9341_COLOR_BLUE, "Mode Saisi");
 	ILI9341_printf(X_END-75, Y_START+15, &Font_7x10, ILI9341_COLOR_WHITE, ILI9341_COLOR_BLUE, "[Bouton U]");

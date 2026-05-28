@@ -8,6 +8,8 @@
 #ifndef SCREEN_SCREEN_HOME_H_
 #define SCREEN_SCREEN_HOME_H_
 
-void home_show_home(void);
+#include "screen/screen.h"
+
+void home_show_home();
 
 #endif /* SCREEN_SCREEN_HOME_H_ */

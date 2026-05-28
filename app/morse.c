@@ -7,6 +7,7 @@
 
 #include "morse.h"
 #include <string.h>
+#include <ctype.h>
 
 const char* morse_table[36] = {
 	".-", "-...", "-.-.", "-..", ".", "..-.", "--.", "....", "..", // A-I
@@ -18,18 +19,94 @@ const char* morse_table[36] = {
 // as lower
 const char* char_table = "abcdefghijklmnopqrstuvwxyz0123456789";
 
-void morse_decode(const char* input, char* output){
+void morse_decode(char* input, char* output){
+	int out_index = 0;
+	char morse_char[10];
+	int morse_index = 0;
+	int space_count = 0;
 
+	output[0] = '\0';
+
+	for(int i = 0; ; i++){
+		char c = input[i];
+
+		if(c == '.' || c == '-'){
+			morse_char[morse_index++] = c;
+			space_count = 0;
+		}
+
+		else if(c == ' '){
+			space_count++;
+
+			// fin d'une lettre
+			if(morse_index > 0){
+				morse_char[morse_index] = '\0';
+
+				for(int j = 0; j < 36; j++){
+					if(strcmp(morse_char, morse_table[j]) == 0){
+						output[out_index++] =
+							tolower((unsigned char)char_table[j]);
+						break;
+					}
+				}
+
+				morse_index = 0;
+			}
+
+			// deux espaces = séparation de mots
+			else if(space_count == 2){
+				output[out_index++] = ' ';
+				space_count = 0;
+			}
+		}
+
+		else if(c == '\0'){
+			if(morse_index > 0){
+				morse_char[morse_index] = '\0';
+
+				for(int j = 0; j < 36; j++){
+					if(strcmp(morse_char, morse_table[j]) == 0){
+						output[out_index++] =
+							tolower((unsigned char)char_table[j]);
+						break;
+					}
+				}
+			}
+			break;
+		}
+	}
+
+	output[out_index] = '\0';
 }
 
-void morse_encode(const char* input, char* output){
+
+void morse_encode(char* input, char* output){
+	output[0] = '\0';   // initialise proprement
+
 	for(int i = 0; input[i] != '\0'; i++){
-		char c = input[i];
-		// concatène le code Morse correspondant au caractère c dans output
+		char c = tolower(input[i]);
+
 		const char* morse_code = NULL;
-		morse_code = morse_table[c - 'a'];
+
+		if(c == '\r' || c == '\n'){
+			strcat(output, "\n");
+			continue;
+		}
+
+		if(c == ' '){
+			strcat(output, "  ");
+			continue;
+		}
+
+		if(c >= 'a' && c <= 'z'){
+			morse_code = morse_table[c - 'a'];
+		}
+		else if(c >= '0' && c <= '9'){
+			morse_code = morse_table[26 + (c - '0')];
+		}
+
 		if(morse_code != NULL){
-			strncat(output, morse_code, strlen(morse_code));
+			strcat(output, morse_code);
 		}
 	}
 }

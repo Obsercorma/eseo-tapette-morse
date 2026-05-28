@@ -14,7 +14,7 @@
  * @param output Le buffer ou stocker la chaine Morse resultante
  * @param output_size La taille du buffer de sortie
  */
-void morse_decode(const char* input, char* output);
+void morse_decode(char* input, char* output);
 
 /**
  * @brief Decode une chaine de Morse en caracteres
@@ -22,6 +22,6 @@ void morse_decode(const char* input, char* output);
  * @param output Le buffer ou stocker la chaine de caracteres resultante
  * @param output_size La taille du buffer de sortie
  */
-void morse_encode(const char* input, char* output);
+void morse_encode(char* input, char* output);
 
 #endif /* MORSE_H_ */
