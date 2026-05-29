@@ -9,7 +9,65 @@
 #include "tft_ili9341/stm32g4_ili9341.h"
 #include "tft_ili9341/stm32g4_fonts.h"
 #include "screen/screen.h"
+#include "screen/frames/home.h"
+#include "screen/frames/shutdown.h"
 #include "screen/frames/typing_mode.h"
+#include <string.h>
+#include "stm32g4_sys.h"
+
+static char current_message[200] = "";
+
+static uint8_t st1 = 1;
+
+void _typing_mode_blank_message(){
+	ILI9341_DrawFilledRectangle(20, 40, 220, 160, ILI9341_COLOR_WHITE); // Efface la zone de saisie
+}
+
+void typing_mode_clear_current_message(){
+	size_t len = strlen(current_message);
+	for(size_t i = 0; i < len; i++){
+		current_message[i] = '\0';
+	}
+}
+
+void typing_mode_append_to_current_message(char c){
+	size_t len = strlen(current_message);
+	if(len < 100){ // Limite la taille du message à 100 caractères
+		current_message[len] = c;
+	}
+	_typing_mode_blank_message(); // Efface la zone de saisie
+	ILI9341_printf(X_START, Y_START+45, &Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE, "%s", current_message);
+}
+
+void static _typing_mode_remove_last_character(){
+	size_t len = strlen(current_message);
+	if(len > 0){
+		current_message[len-1] = '\0';
+	}
+	_typing_mode_blank_message(); // Efface la zone de saisie
+	ILI9341_printf(X_START, Y_START+45, &Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE, "%s", current_message);
+}
+
+void static _typing_mode_put_dot(){
+	typing_mode_append_to_current_message('.');
+}
+
+void static _typing_mode_put_dash(){
+	typing_mode_append_to_current_message('-');
+}
+
+void static _typing_mode_put_space(){
+	typing_mode_append_to_current_message(' ');
+}
+
+void typing_mode_get_current_message(char* buffer, size_t size){
+	if(current_message[0] != '\0' && size > 0){
+		strncpy(buffer, current_message, size);
+		buffer[size-1] = '\0';
+	}else{
+		buffer[0] = '\0';
+	}
+}
 
 void typing_mode_show_instructions(){
 	// Draw the Typing option mode
@@ -46,12 +104,25 @@ void typing_mode_show_instructions_calibration(){
 }
 
 void typing_mode_show_btns_instructions(){
+	ScreenCallbacks_t callbacks = {
+		.button_u  = NULL,
+		.button_m  = typing_mode_show_frame_empty_message,
+		.button_r  = NULL,
+		.button_l  = NULL,
+		.button_long_d = home_show_home,
+	};
+	screen_should_clear(&st1);
+	screen_clear();
+	screen_set_callbacks(&callbacks);
 	ILI9341_printf(X_START-5, Y_START, &Font_7x10, ILI9341_COLOR_BLACK, ILI9341_COLOR_YELLOW, "[ MODE SAISIE - INSTRUCTIONS 3 BOUTONS ]");
 
-	ILI9341_printf(X_START, Y_START+30, &Font_7x10, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE, "L pour saisir \".\"\n\nR pour saisir \"-\"\n\nM pour passer au prochain caractere\n\nMx2 pour espace");
+	ILI9341_printf(X_START, Y_START+30, &Font_7x10, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE, "L pour saisir \".\"\n\nR pour saisir \"-\"\n\nD pour effacer un caractere\n\nM pour passer au prochain caractere\n\nMx2 pour espace");
 
-	ILI9341_DrawFilledRectangle(X_START+80, Y_START+120, X_START+200, Y_START+140, ILI9341_COLOR_YELLOW);
-	ILI9341_printf(X_START+85, Y_START+125, &Font_7x10, ILI9341_COLOR_BLACK, ILI9341_COLOR_YELLOW, "M pour continuer");
+	ILI9341_DrawFilledRectangle(X_START+80, Y_START+150, X_START+200, Y_START+170, ILI9341_COLOR_YELLOW);
+	ILI9341_printf(X_START+85, Y_START+155, &Font_7x10, ILI9341_COLOR_BLACK, ILI9341_COLOR_YELLOW, "M pour continuer");
+
+	ILI9341_DrawFilledRectangle(X_START+70, Y_START+180, X_START+210, Y_START+200, ILI9341_COLOR_YELLOW);
+	ILI9341_printf(X_START+75, Y_START+185, &Font_7x10, ILI9341_COLOR_BLACK, ILI9341_COLOR_YELLOW, "D long pour quitter");
 }
 
 void typing_mode_show_sent_message_info(){
@@ -71,7 +142,26 @@ void typing_mode_show_repeating_message_info(){
 }
 
 void typing_mode_show_frame_empty_message(){
+	ScreenCallbacks_t callbacks = {
+		.button_u  = NULL,
+		.button_d  = _typing_mode_remove_last_character,
+		.button_m  = _typing_mode_put_space,
+		.button_r  = _typing_mode_put_dash,
+		.button_l  = _typing_mode_put_dot,
+		.button_long_d = typing_mode_show_btns_instructions,
+		.button_long_u = shutdown_show_alert
+	};
+
+	screen_should_clear(0);
+	typing_mode_clear_current_message();
+	screen_set_callbacks(&callbacks);
+	shutdown_should_go_back_to_home(typing_mode_show_btns_instructions);
+
 	ILI9341_printf(X_START+80, Y_START, &Font_7x10, ILI9341_COLOR_BLACK, ILI9341_COLOR_YELLOW, "[ MODE SAISIE ]");
 
-	ILI9341_printf(X_START+70, Y_START+180, &Font_7x10, ILI9341_COLOR_BLACK, ILI9341_COLOR_YELLOW, "D long pour quitter");
+	if(current_message[0] != '\0')
+		ILI9341_printf(X_START+30, Y_START+45, &Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE, "%s", current_message);
+
+	ILI9341_printf(X_START+70, Y_START+180, &Font_7x10, ILI9341_COLOR_BLACK, ILI9341_COLOR_YELLOW, "[U 2x] pour envoyer");
+	ILI9341_printf(X_START, Y_START+195, &Font_7x10, ILI9341_COLOR_WHITE, ILI9341_COLOR_RED, "[U long] mode veille [D long] pour quitter");
 }

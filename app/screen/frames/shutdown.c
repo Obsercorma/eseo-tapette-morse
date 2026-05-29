@@ -6,9 +6,17 @@
  */
 
 #include "screen/screen.h"
+#include "screen/frames/home.h"
 #include "screen/frames/shutdown.h"
 #include "tft_ili9341/stm32g4_ili9341.h"
 #include "tft_ili9341/stm32g4_fonts.h"
+
+static ButtonCallback callback_to_go_back;
+
+void shutdown_should_go_back_to_home(ButtonCallback callback){
+	callback_to_go_back = *callback;
+
+}
 
 void shutdown_show_auto_alert(){
 	ILI9341_printf(X_START+40, Y_START, &Font_11x18, ILI9341_COLOR_WHITE, ILI9341_COLOR_RED, "[ MODE VEILLE AUTO ]");
@@ -22,6 +30,23 @@ void shutdown_show_auto_alert(){
 }
 
 void shutdown_show_alert(){
+	screen_clear();
+	ScreenCallbacks_t callbacks = {
+		.button_d = NULL,
+		.button_l = NULL, // TODO: fonction pour eteindre l'ecran
+		.button_m = NULL,
+		.button_u = NULL,
+		.button_r = callback_to_go_back,
+		.button_long_d = home_show_home,
+		.button_long_u = NULL,
+		.button_long_m = NULL,
+		.button_long_r = NULL,
+		.button_double_u = NULL,
+		.button_double_l = NULL,
+		.button_double_m = NULL,
+	};
+	screen_set_callbacks(&callbacks);
+
 	ILI9341_printf(X_START+70, Y_START, &Font_11x18, ILI9341_COLOR_WHITE, ILI9341_COLOR_RED, "[ MODE VEILLE ]");
 
 	ILI9341_printf(X_START+20, Y_START+50, &Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE, "Souhaitez-vous vraiment\n   mettre en veille ?");

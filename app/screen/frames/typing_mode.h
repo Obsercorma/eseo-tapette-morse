@@ -8,6 +8,26 @@
 #ifndef SCREEN_FRAMES_TYPING_MODE_H_
 #define SCREEN_FRAMES_TYPING_MODE_H_
 
+#include "stm32g4_sys.h"
+
+/**
+ * @brief Récupère le message en cours de saisie
+ * @param buffer Buffer dans lequel le message sera copié
+ * @param size Taille du buffer
+ */
+void typing_mode_get_current_message(char* buffer, size_t size);
+
+/**
+ * @brief Efface le message en cours de saisie
+ */
+void typing_mode_clear_current_message(void);
+
+/**
+ * @brief Ajoute un caractère à la fin du message en cours de saisie
+ * @param c Caractère à ajouter
+ */
+void typing_mode_append_to_current_message(char c);
+
 /**
  * @brief Affiche les instructions du mode de saisie
  */

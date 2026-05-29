@@ -23,16 +23,39 @@
 #define BTN_PIN_L_NUMBER 11
 #define BTN_PIN_M_NUMBER 12
 
+#define BTN_LONG_PRESS_DURATION 1500U // 2000 ms
+#define BTN_DEBOUNCE_MS 50U // 50 ms
+#define BTN_DOUBLE_PRESS_WINDOW 500U // 500 ms
+
+#define BTN_EVENT_NONE    0
+#define BTN_EVENT_SIMPLE  1
+#define BTN_EVENT_DOUBLE  2
+#define BTN_EVENT_LONG    3
+
 typedef struct {
 	volatile uint8_t which_btn;
 	volatile uint32_t duration;
 	volatile uint8_t new_event;
+	volatile uint8_t is_long_press;
+	volatile uint8_t is_double_press;
+	volatile uint8_t event_type;
 } ButtonState_t;
 
 /**
  * @brief Initialisation des GPIOs des boutons U (PA0), M (PA12), L (PA3), R (PA1) et D (PA2)
  */
 void buttons_init(void);
+
+
+/**
+ * @brief Efface l'événement de bouton en cours, doit être appelé après avoir traité un événement de bouton
+ */
+void buttons_clear_event(void);
+
+/**
+ * @brief Met à jour l'état des boutons, doit être appelé régulièrement dans la boucle principale pour gérer les événements de double pression
+ */
+void buttons_update(void);
 
 void buttons_get_state(ButtonState_t* state);
 

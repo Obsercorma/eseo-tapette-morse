@@ -10,6 +10,6 @@
 
 #include "screen/screen.h"
 
-void home_show_home();
+void home_show_home(void);
 
 #endif /* SCREEN_SCREEN_HOME_H_ */

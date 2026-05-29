@@ -14,7 +14,6 @@
 #include "stm32g4_gpio.h"
 #include "stm32g4_uart.h"
 #include "stm32g4_utils.h"
-#include "led_status.h"
 #include "screen/screen.h"
 #include "screen/frames/home.h"
 #include "screen/frames/shutdown.h"
@@ -22,16 +21,16 @@
 #include "screen/frames/receiving_mode.h"
 #include "buttons.h"
 #include "bluetooth.h"
+#include "screen/screen.h"
 #include "morse.h"
 
 #include <stdio.h>
 #include <string.h>
 
 /**
-  * @brief  Point d'entrée de votre application
-  */
-int main(void)
-{
+ * @brief  Point d'entrée de votre application
+ */
+int main(void) {
 	/* Cette ligne doit rester la première de votre main !
 	 * Elle permet d'initialiser toutes les couches basses des drivers (Hardware Abstraction Layer),
 	 * condition préalable indispensable à l'exécution des lignes suivantes.
@@ -48,10 +47,7 @@ int main(void)
 
 	/* Indique que les printf sont dirigés vers l'UART2 */
 	//BSP_SYS_set_std_usart(UART2_ID, UART2_ID, UART2_ID);
-
 	//heartbeat();
-
-
 	screen_init();
 	//screen_show_mode(SCREEN_HOME_MODE);
 
@@ -61,8 +57,6 @@ int main(void)
 	home_show_home();
 	screen_get_callbacks(&screen_callbacks);
 
-	led_status_init();
-
 	buttons_init();
 
 	ButtonState_t btn_state;
@@ -71,44 +65,80 @@ int main(void)
 	char bluetooth_buffer[200];
 	bluetooth_buffer[0] = '\0';
 	size_t bluetooth_buffer_size = 0;
-
-	uint32_t last_tick = HAL_GetTick();
-
+	uint8_t should_clear_screen = 1;
 
 	/* Tâche de fond, boucle infinie, Infinite loop,... quelque soit son nom vous n'en sortirez jamais */
-	while (1)
-	{
+	while (1) {
 		bluetooth_check_data(bluetooth_buffer, &bluetooth_buffer_size);
 		bluetooth_get_data(&bt_data);
+
+		buttons_update();
 		buttons_get_state(&btn_state);
-		if(bluetooth_buffer[0] != '\0'){
-			screen_clear();
-			char output[512] = {0}; // 5 est une estimation de la taille maximale d'un message Morse correspondant à une chaîne de caractères (1 caractère = 4 symboles Morse + 1 espace)
-			morse_decode(bluetooth_buffer, output);
-			receiving_mode_show_received_message(output);
-			bluetooth_buffer[0] = '\0';
-			HAL_Delay(1000);
-		}
+
+		screen_get_should_clear(&should_clear_screen);
+
 		HAL_Delay(10);
-		if(btn_state.new_event){
-			screen_clear();
-			if(btn_state.which_btn == BTN_PIN_M_NUMBER){
-				screen_callbacks.button_m();
+		if (btn_state.event_type != BTN_EVENT_NONE) {
+			if (should_clear_screen == 1) {
+				screen_clear();
 			}
-			if(btn_state.which_btn == BTN_PIN_U_NUMBER){
-				screen_callbacks.button_u();
+			if (btn_state.which_btn == BTN_PIN_M_NUMBER) {
+				if (btn_state.event_type == BTN_EVENT_LONG
+						&& screen_callbacks.button_long_m != NULL) {
+					screen_callbacks.button_long_m();
+				} else if (btn_state.event_type == BTN_EVENT_DOUBLE
+						&& screen_callbacks.button_double_m != NULL) {
+					screen_callbacks.button_double_m();
+				} else if (screen_callbacks.button_m != NULL) {
+					screen_callbacks.button_m();
+				}
 			}
-			if(btn_state.which_btn == BTN_PIN_L_NUMBER){
-				screen_callbacks.button_l();
+			if (btn_state.which_btn == BTN_PIN_U_NUMBER) {
+				if (btn_state.event_type == BTN_EVENT_LONG
+						&& screen_callbacks.button_long_u != NULL) {
+					screen_callbacks.button_long_u();
+				} else if (btn_state.event_type == BTN_EVENT_DOUBLE
+						&& screen_callbacks.button_double_u != NULL) {
+					screen_callbacks.button_double_u();
+				} else if (screen_callbacks.button_u != NULL) {
+					screen_callbacks.button_u();
+				}
 			}
-			if(btn_state.which_btn == BTN_PIN_R_NUMBER){
-				screen_callbacks.button_r();
+			if (btn_state.which_btn == BTN_PIN_L_NUMBER) {
+				if (btn_state.event_type == BTN_EVENT_LONG
+						&& screen_callbacks.button_long_l != NULL) {
+					screen_callbacks.button_long_l();
+				} else if (btn_state.event_type == BTN_EVENT_DOUBLE
+						&& screen_callbacks.button_double_l != NULL) {
+					screen_callbacks.button_double_l();
+				} else if (screen_callbacks.button_l != NULL) {
+					screen_callbacks.button_l();
+				}
 			}
-			if(btn_state.which_btn == BTN_PIN_D_NUMBER){
-				screen_callbacks.button_d();
+			if (btn_state.which_btn == BTN_PIN_R_NUMBER) {
+				if (btn_state.event_type == BTN_EVENT_LONG
+						&& screen_callbacks.button_long_r != NULL) {
+					screen_callbacks.button_long_r();
+				} else if (btn_state.event_type == BTN_EVENT_DOUBLE
+						&& screen_callbacks.button_double_r != NULL) {
+					screen_callbacks.button_double_r();
+				} else if (screen_callbacks.button_r != NULL) {
+					screen_callbacks.button_r();
+				}
+			}
+			if (btn_state.which_btn == BTN_PIN_D_NUMBER) {
+				if (btn_state.event_type == BTN_EVENT_LONG
+						&& screen_callbacks.button_long_d != NULL) {
+					screen_callbacks.button_long_d();
+				} else if (btn_state.event_type == BTN_EVENT_DOUBLE
+						&& screen_callbacks.button_double_d != NULL) {
+					screen_callbacks.button_double_d();
+				} else if (screen_callbacks.button_d != NULL) {
+					screen_callbacks.button_d();
+				}
 			}
 			screen_get_callbacks(&screen_callbacks);
-			HAL_Delay(200);
+			buttons_clear_event();
 		}
 	}
 }

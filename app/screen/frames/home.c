@@ -17,9 +17,18 @@ void home_show_home(){
 	ScreenCallbacks_t callbacks = {
 		.button_u  = typing_mode_show_btns_instructions,
 		.button_m  = receiving_mode_show_home,
-		.button_r  = shutdown_show_alert,
-
+		.button_r  = NULL,
+		.button_l  = NULL,
+		.button_long_d = NULL,
+		.button_long_u = NULL,
+		.button_long_m = NULL,
+		.button_long_r = NULL,
+		.button_double_r = shutdown_show_alert,
+		.button_double_u = NULL,
+		.button_double_m = NULL,
+		.button_double_l = NULL,
 	};
+	shutdown_should_go_back_to_home(home_show_home);
 	screen_set_callbacks(&callbacks);
 
 	ILI9341_DrawFilledRectangle(X_START, Y_START, X_END, 60, ILI9341_COLOR_BLUE); // @suppress("Symbol is not resolved")

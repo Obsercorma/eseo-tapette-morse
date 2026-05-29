@@ -10,8 +10,16 @@
 #include "screen/screen.h"
 #include "screen/frames/receiving_mode.h"
 
+static char message[200];
 
 void receiving_mode_show_home(){
+	ScreenCallbacks_t callbacks = {
+		.button_u  = receiving_mode_show_question_message,
+		.button_m  = receiving_mode_show_received_message,
+		.button_r  = NULL,
+		.button_l  = NULL,
+	};
+	screen_set_callbacks(&callbacks);
 	ILI9341_DrawFilledRectangle(X_START, Y_START, X_END, 60, ILI9341_COLOR_BLUE); // @suppress("Symbol is not resolved")
 	ILI9341_printf(X_START+15, Y_START+15, &Font_7x10, ILI9341_COLOR_WHITE, ILI9341_COLOR_BLUE, "Activer / Desactiver");
 	ILI9341_printf(X_END-75, Y_START+15, &Font_7x10, ILI9341_COLOR_WHITE, ILI9341_COLOR_BLUE, "[Bouton M]");
@@ -32,10 +40,15 @@ void receiving_mode_show_question_message(){
 	ILI9341_printf(X_START+30, Y_START+170, &Font_7x10, ILI9341_COLOR_WHITE, ILI9341_COLOR_RED, "Attention, vous ne pourrez le\n consulter qu'une seule fois ");
 }
 
-void receiving_mode_show_received_message(const char* message){
+void receiving_mode_show_received_message(){
 	ILI9341_printf(X_START+20, Y_START, &Font_7x10, ILI9341_COLOR_BLACK, ILI9341_COLOR_YELLOW, "[ MODE RECEPTION - MESSAGE RECU ]");
 
 	ILI9341_printf(X_START-5, Y_START+65, &Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE, "Message recu :");
 
 	ILI9341_printf(X_START+30, Y_START+130, &Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE, message);
+}
+
+void receiving_mode_set_message(char* msg){
+	strncpy(message, msg, sizeof(message) - 1);
+	message[sizeof(message) - 1] = '\0';
 }
