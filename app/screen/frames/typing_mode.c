@@ -5,6 +5,7 @@
  *      Author: obsercorma
  */
 
+#include <string.h>
 
 #include "tft_ili9341/stm32g4_ili9341.h"
 #include "tft_ili9341/stm32g4_fonts.h"
@@ -12,7 +13,7 @@
 #include "screen/frames/home.h"
 #include "screen/frames/shutdown.h"
 #include "screen/frames/typing_mode.h"
-#include <string.h>
+#include "bluetooth.h"
 #include "stm32g4_sys.h"
 
 static char current_message[200] = "";
@@ -60,6 +61,10 @@ void static _typing_mode_put_space(){
 	typing_mode_append_to_current_message(' ');
 }
 
+void static _typing_mode_put_new_word(){
+	typing_mode_append_to_current_message('|');
+}
+
 void typing_mode_get_current_message(char* buffer, size_t size){
 	if(current_message[0] != '\0' && size > 0){
 		strncpy(buffer, current_message, size);
@@ -67,6 +72,16 @@ void typing_mode_get_current_message(char* buffer, size_t size){
 	}else{
 		buffer[0] = '\0';
 	}
+}
+
+void typing_mode_show_sending_message_info(){
+	bluetooth_send_data(current_message);
+	ILI9341_printf(X_START+75, Y_START+160, &Font_7x10, ILI9341_COLOR_WHITE, ILI9341_COLOR_BLUE, "[ ENVOI EN COURS ]");
+}
+
+void typing_mode_show_success_send(){
+	ILI9341_DrawFilledRectangle(X_START+70, Y_START+160, X_START+160, Y_START+170, ILI9341_COLOR_WHITE);
+	ILI9341_printf(X_START+80, Y_START+160, &Font_7x10, ILI9341_COLOR_WHITE, ILI9341_COLOR_GREEN, "[ MESSAGE ENVOYE ]");
 }
 
 void typing_mode_show_instructions(){
@@ -110,13 +125,22 @@ void typing_mode_show_btns_instructions(){
 		.button_r  = NULL,
 		.button_l  = NULL,
 		.button_long_d = home_show_home,
+		.button_long_l = NULL,
+		.button_long_m = NULL,
+		.button_long_r = NULL,
+		.button_long_u = NULL,
+		.button_double_d = NULL,
+		.button_double_l = NULL,
+		.button_double_m = NULL,
+		.button_double_r = NULL,
+		.button_double_u = NULL
 	};
 	screen_should_clear(&st1);
 	screen_clear();
 	screen_set_callbacks(&callbacks);
 	ILI9341_printf(X_START-5, Y_START, &Font_7x10, ILI9341_COLOR_BLACK, ILI9341_COLOR_YELLOW, "[ MODE SAISIE - INSTRUCTIONS 3 BOUTONS ]");
 
-	ILI9341_printf(X_START, Y_START+30, &Font_7x10, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE, "L pour saisir \".\"\n\nR pour saisir \"-\"\n\nD pour effacer un caractere\n\nM pour passer au prochain caractere\n\nMx2 pour espace");
+	ILI9341_printf(X_START, Y_START+30, &Font_7x10, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE, "L pour saisir \".\"\n\nR pour saisir \"-\"\n\nD pour effacer un caractere\n\nM pour passer au prochain caractere\n\nMx2 pour nouveau mot");
 
 	ILI9341_DrawFilledRectangle(X_START+80, Y_START+150, X_START+200, Y_START+170, ILI9341_COLOR_YELLOW);
 	ILI9341_printf(X_START+85, Y_START+155, &Font_7x10, ILI9341_COLOR_BLACK, ILI9341_COLOR_YELLOW, "M pour continuer");
@@ -149,7 +173,9 @@ void typing_mode_show_frame_empty_message(){
 		.button_r  = _typing_mode_put_dash,
 		.button_l  = _typing_mode_put_dot,
 		.button_long_d = typing_mode_show_btns_instructions,
-		.button_long_u = shutdown_show_alert
+		.button_long_u = shutdown_show_alert,
+		.button_double_m = _typing_mode_put_new_word,
+		.button_double_u = typing_mode_show_sending_message_info
 	};
 
 	screen_should_clear(0);

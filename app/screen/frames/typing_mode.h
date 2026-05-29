@@ -29,6 +29,16 @@ void typing_mode_clear_current_message(void);
 void typing_mode_append_to_current_message(char c);
 
 /**
+ * @brief Affiche un message indiquant que l'envoi est en cours
+ */
+void typing_mode_show_sending_message_info(void);
+
+/**
+ * @brief Affiche un message de success post-envoi
+ */
+void typing_mode_show_success_send(void);
+
+/**
  * @brief Affiche les instructions du mode de saisie
  */
 void typing_mode_show_instructions(void);

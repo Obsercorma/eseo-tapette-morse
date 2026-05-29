@@ -52,12 +52,9 @@ void morse_decode(char* input, char* output){
 
 				morse_index = 0;
 			}
-
-			// deux espaces = séparation de mots
-			else if(space_count == 2){
-				output[out_index++] = ' ';
-				space_count = 0;
-			}
+		}
+		else if(c == '|'){
+			output[out_index++] = '|';
 		}
 
 		else if(c == '\0'){

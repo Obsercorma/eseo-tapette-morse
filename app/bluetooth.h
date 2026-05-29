@@ -15,11 +15,30 @@ typedef struct {
 	char data_to_bluetooth[200];
 } BluetoothData_t;
 
+typedef enum {
+	BL_NONE = 0,
+	BL_SEND_SUCCESS,
+	BL_SEND_ERROR,
+	BL_RECEIVE_ERROR,
+	BL_IDLE,
+} BluetoothMessagesCases_e;
+
 /**
  * @brief Initialisation du module Bluetooth HC-05
  */
 void bluetooth_init(void);
 
+/**
+ * @brief Recupere le statut du module bluetooth
+ * @param cs: statut du module bluetooth
+ */
+void bluetooth_get_status(BluetoothMessagesCases_e* cs);
+
+/**
+ * @brief Redéfinie le statut du module bluetooth de force
+ * @param cs: statut à appliquer
+ */
+void bluetooth_set_status(BluetoothMessagesCases_e cs);
 
 /**
  * @brief Verifie si des donnees sont disponibles sur le module Bluetooth, et les affiche sur l'UART2
@@ -37,6 +56,11 @@ void bluetooth_send_data(char* data);
  * @brief Recupere les donnees recues par le module Bluetooth et les stocke dans la structure BluetoothData_t
  */
 void bluetooth_get_data(BluetoothData_t* data);
+
+/**
+ * @brief Stocke des donnees a envoyer au module Bluetooth dans la structure BluetoothData_t
+ */
+void bluetooth_set_data(BluetoothData_t* data);
 
 /**
  * @brief Efface les donnees recues par le module Bluetooth dans la structure BluetoothData_t

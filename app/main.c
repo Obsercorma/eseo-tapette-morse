@@ -61,21 +61,25 @@ int main(void) {
 
 	ButtonState_t btn_state;
 	buttons_get_state(&btn_state);
-	BluetoothData_t bt_data;
+
 	char bluetooth_buffer[200];
 	bluetooth_buffer[0] = '\0';
 	size_t bluetooth_buffer_size = 0;
+	BluetoothMessagesCases_e blCase = BL_NONE;
+	uint32_t timeoutBlCase = 0;
+
 	uint8_t should_clear_screen = 1;
 
 	/* Tâche de fond, boucle infinie, Infinite loop,... quelque soit son nom vous n'en sortirez jamais */
 	while (1) {
 		bluetooth_check_data(bluetooth_buffer, &bluetooth_buffer_size);
-		bluetooth_get_data(&bt_data);
 
 		buttons_update();
 		buttons_get_state(&btn_state);
 
 		screen_get_should_clear(&should_clear_screen);
+
+		bluetooth_get_status(&blCase);
 
 		HAL_Delay(10);
 		if (btn_state.event_type != BTN_EVENT_NONE) {
@@ -139,6 +143,25 @@ int main(void) {
 			}
 			screen_get_callbacks(&screen_callbacks);
 			buttons_clear_event();
+		}
+		if(blCase != BL_NONE){
+			switch(blCase){
+				case BL_SEND_SUCCESS:
+				case BL_SEND_ERROR:
+					typing_mode_show_success_send();
+					bluetooth_set_status(BL_IDLE);
+					timeoutBlCase = HAL_GetTick();
+					break;
+				case BL_IDLE:
+					if((HAL_GetTick() - timeoutBlCase) >= 2000){
+						screen_clear();
+						typing_mode_show_frame_empty_message();
+						bluetooth_set_status(BL_NONE);
+					}
+					break;
+				default:
+					break;
+			}
 		}
 	}
 }
