@@ -20,10 +20,16 @@ static char current_message[200] = "";
 
 static uint8_t st1 = 1;
 
+/**
+ * @brief Efface la zone de saisie
+ */
 void _typing_mode_blank_message(){
-	ILI9341_DrawFilledRectangle(20, 40, 220, 160, ILI9341_COLOR_WHITE); // Efface la zone de saisie
+	ILI9341_DrawFilledRectangle(20, 40, 220, 160, ILI9341_COLOR_WHITE);
 }
 
+/**
+ * @brief Efface le message courant stocké en mémoire
+ */
 void typing_mode_clear_current_message(){
 	size_t len = strlen(current_message);
 	for(size_t i = 0; i < len; i++){
@@ -31,6 +37,9 @@ void typing_mode_clear_current_message(){
 	}
 }
 
+/**
+ * @brief Ajoute un caractère morse à la chaine
+ */
 void typing_mode_append_to_current_message(char c){
 	size_t len = strlen(current_message);
 	if(len < 100){ // Limite la taille du message à 100 caractères
@@ -40,6 +49,9 @@ void typing_mode_append_to_current_message(char c){
 	ILI9341_printf(X_START, Y_START+45, &Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE, "%s", current_message);
 }
 
+/**
+ * @brief Retire le dernier caractère de la chaine
+ */
 void static _typing_mode_remove_last_character(){
 	size_t len = strlen(current_message);
 	if(len > 0){
@@ -49,18 +61,38 @@ void static _typing_mode_remove_last_character(){
 	ILI9341_printf(X_START, Y_START+45, &Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE, "%s", current_message);
 }
 
+/**
+ * @brief Gestion de l'ajout du point en Morse
+ * @note Est exploité par le système de ScreenCallbacks
+ * @see ScreenCallbacks_t screen.h
+ */
 void static _typing_mode_put_dot(){
 	typing_mode_append_to_current_message('.');
 }
 
+/**
+ * @brief Gestion de l'ajout du trait en Morse
+ * @note Est exploité par le système de ScreenCallbacks
+ * @see ScreenCallbacks_t screen.h
+ */
 void static _typing_mode_put_dash(){
 	typing_mode_append_to_current_message('-');
 }
 
+/**
+ * @brief Gestion de l'ajout d'un espace entre mots
+ * @note Est exploité par le système de ScreenCallbacks
+ * @see ScreenCallbacks_t screen.h
+ */
 void static _typing_mode_put_space(){
 	typing_mode_append_to_current_message(' ');
 }
 
+/**
+ * @brief Gestion de l'ajout d'une barre verticale (interprétation propriétaire des besoins de ce projet)
+ * @note Est exploité par le système de ScreenCallbacks
+ * @see ScreenCallbacks_t screen.h
+ */
 void static _typing_mode_put_new_word(){
 	typing_mode_append_to_current_message('|');
 }

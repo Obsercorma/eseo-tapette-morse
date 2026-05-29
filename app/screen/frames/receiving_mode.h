@@ -21,8 +21,15 @@ void receiving_mode_show_home(void);
  */
 void receiving_mode_show_question_message(void);
 
+/**
+ * @brief Affiche des composants textuels sur l'écran afin d'indiquer que le dispositif est en mode réception continue
+ */
 void receiving_mode_show_received_message(void);
 
+/**
+ * @brief Définit le message reçue à afficher à l'écran
+ * @param msg: Message à afficher
+ */
 void receiving_mode_set_message(char* msg);
 
 #endif /* SCREEN_SCREEN_RECEIVING_MODE_H_ */

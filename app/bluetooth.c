@@ -28,7 +28,7 @@ void bluetooth_set_status(BluetoothMessagesCases_e cs){
 }
 
 void bluetooth_send_data(char* data){
-	BSP_UART_puts(UART1_ID, (const char*)data, 0);
+	BSP_UART_puts(UART1_ID, (const uint8_t*)data, 0);
 }
 
 void bluetooth_check_data(char* bluetooth_buffer, size_t* buffer_size){

@@ -67,7 +67,9 @@ void buttons_update(void)
 	}
 }
 
-
+/**
+ * @brief Gestion des intérruptions EXTI
+ */
 static void callback_handler(uint8_t GPIO_Pin)
 {
 	static uint32_t last_gpio[16] = {0};

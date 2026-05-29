@@ -10,23 +10,23 @@
 
 #include "stm32g4_sys.h"
 
+// Positions de départs sur l'écran
 #define X_START 20
 #define Y_START 20
 #define X_END 300
 
+// Délai avant mise en veille
 #define SECONDS_BEFORE_SHUTDOWN 30U
 
-typedef enum {
-	SCREEN_LEARNING_MODE = 0,
-	SCREEN_HOME_MODE,
-	SCREEN_STANDBY_MODE,
-	SCREEN_TYPING_MODE,
-	SCREEN_RECEIVING_MODE
-} ScreenMode;
-
+/**
+ * @brief Définition d'un type de Callback atrendu et à executer au moment d'une intéraction utilisateur
+ */
 typedef void (*ButtonCallback)(void);
 
-
+/**
+ * @brief Structure permettant d'enregistrer les adresses de fonctions à appeler (Callbacks) par rapport à la frame (et de ses options) affichés à l'écran.
+ * @note Cette structure dispose de propriétés pour gérer les trois types d'événements (appui court, long et double)
+ */
 typedef struct ScreenCallbacks_t {
 	ButtonCallback button_u;
 	ButtonCallback button_m;
@@ -50,8 +50,6 @@ typedef struct ScreenCallbacks_t {
  * @note La touch screen et l'extension SD est exclue.
  */
 void screen_init(void);
-
-void screen_show_mode(ScreenMode mode);
 
 /**
  * @brief Efface tout le contenu de l'écran
