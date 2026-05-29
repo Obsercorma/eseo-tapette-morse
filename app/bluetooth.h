@@ -10,10 +10,6 @@
 
 #include "stm32g4_sys.h"
 
-typedef struct {
-	char data_from_bluetooth[200];
-	char data_to_bluetooth[200];
-} BluetoothData_t;
 
 typedef enum {
 	BL_NONE = 0,
@@ -51,16 +47,6 @@ void bluetooth_check_data(char* bluetooth_buffer, size_t* buffer_size);
  * @param length Longueur des donnees a envoyer
  */
 void bluetooth_send_data(char* data);
-
-/*
- * @brief Recupere les donnees recues par le module Bluetooth et les stocke dans la structure BluetoothData_t
- */
-void bluetooth_get_data(BluetoothData_t* data);
-
-/**
- * @brief Stocke des donnees a envoyer au module Bluetooth dans la structure BluetoothData_t
- */
-void bluetooth_set_data(BluetoothData_t* data);
 
 /**
  * @brief Efface les donnees recues par le module Bluetooth dans la structure BluetoothData_t

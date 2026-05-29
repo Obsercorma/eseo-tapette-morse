@@ -11,8 +11,6 @@
 #include "stm32g4xx_hal_uart.h"
 #include <stdio.h>
 
-BluetoothData_t bluetooth_data;
-
 BluetoothMessagesCases_e blCase = BL_NONE;
 
 void bluetooth_init(){
@@ -31,18 +29,6 @@ void bluetooth_set_status(BluetoothMessagesCases_e cs){
 
 void bluetooth_send_data(char* data){
 	BSP_UART_puts(UART1_ID, (const char*)data, 0);
-}
-
-void bluetooth_get_data(BluetoothData_t* data){
-	(*data) = bluetooth_data;
-}
-
-void bluetooth_set_data(BluetoothData_t* data){
-	bluetooth_data = *data;
-}
-
-void bluetooth_clear_data_from(){
-	bluetooth_data.data_from_bluetooth[0] = '\0';
 }
 
 void bluetooth_check_data(char* bluetooth_buffer, size_t* buffer_size){
